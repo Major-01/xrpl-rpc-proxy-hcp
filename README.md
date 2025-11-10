@@ -13,4 +13,4 @@ Serverless, secure XRP Ledger JSON-RPC proxy.
 ```bash
 terraform login
 terraform init
-terraform apply
+terraform apply# XRPL RPC Proxy
