@@ -6,7 +6,7 @@ const RPC_ENDPOINTS = [
   "wss://s.altnet.rippletest.net:51233"
   // "wss://testnet.xrpl-labs.com"  // Uncomment for fallback
 ];
-const NETWORK = "testnet";
+const NETWORK = "mainnet";
 
 let clients = [];
 

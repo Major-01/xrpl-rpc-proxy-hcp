@@ -2,11 +2,11 @@ module "xrpl_proxy" {
   source = "./modules/xrpl-proxy"
 
   project_name   = "xrpl-rpc-proxy"
-  environment    = "devl"
+  environment    = "prod"
   rpc_endpoints  = [
-  "wss://s.altnet.rippletest.net:51233",  # Official Ripple testnet 
-  "wss://testnet.xrpl-labs.com",          # XRPL Labs (very stable)
-  "wss://s.testnet.ripple.com:51233"      # Ripple-hosted fallback
+    "wss://s1.ripple.com",        # Official Ripple Mainnet
+    "wss://s2.ripple.com",        # Ripple backup
+    "wss://xrplcluster.com"       # Community node
   ]
   rate_limit_rps = 10
   burst_limit    = 20
