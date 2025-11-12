@@ -1,16 +1,7 @@
-# XRPL RPC Proxy (Terraform + AWS Lambda + HCP)
+# XRPL RPC Proxy + Explorer
 
-Serverless, secure XRP Ledger JSON-RPC proxy.
+Serverless XRP Ledger JSON-RPC proxy + React frontend.
 
-## Features
-- Terraform + HCP backend
-- Multi-node failover
-- Rate limiting
-- Testnet/Mainnet toggle
-
-## Deploy
-
+## Backend (Terraform + AWS Lambda)
 ```bash
-terraform login
-terraform init
-terraform apply# XRPL RPC Proxy
+terraform apply
