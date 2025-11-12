@@ -14,6 +14,17 @@ function App() {
     setLoading(true);
     setError('');
     setResult(null);
+    if (result?.result?.account_data) {
+      const drops = result.result.account_data.Balance;
+      const xrp = (drops / 1000000).toFixed(6);
+      setResult(prev => ({ ...prev, xrp }));
+    }
+
+  {result?.xrp && (
+  <div className="mt-4 p-4 bg-green-50 rounded-lg">
+    <p className="font-bold">Balance: {result.xrp} XRP</p>
+  </div>
+  )}
 
     try {
       const payload = {
