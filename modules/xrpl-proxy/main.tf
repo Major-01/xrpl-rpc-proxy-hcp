@@ -8,7 +8,7 @@ data "archive_file" "lambda_zip" {
 
 resource "aws_lambda_function" "xrpl_proxy" {
   filename         = "${path.module}/../../lambda_function.zip"
-  source_code_hash = filebase64sha256("${path.module}/../../lambda_function.zip")
+  source_code_hash = filebase64sha256("${path.module}/../../../lambda_function.zip")
   function_name    = "${var.project_name}-lambda"
   role             = aws_iam_role.lambda_role.arn
   handler          = "index.handler"
