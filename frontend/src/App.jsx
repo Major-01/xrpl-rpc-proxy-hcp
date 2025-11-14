@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const API_URL = 'https://hqmqd5448l.execute-api.us-east-1.amazonaws.com';
+const API_URL = 'https://hqmqd5448l.execute-api.us-east-1.amazonaws.com/prod';
 
 function App() {
   const [method, setMethod] = useState('server_info');  // ← THIS IS THE ONE
