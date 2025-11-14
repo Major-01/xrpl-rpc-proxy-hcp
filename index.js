@@ -1,68 +1,63 @@
 // lambda/index.js
 const { Client } = require('xrpl');
 
+console.log("[STARTUP] Lambda initializing..."); // ← THIS WILL SHOW
+
 const RPC_ENDPOINTS = (process.env.RPC_ENDPOINTS || "").split(",").filter(Boolean);
 let clients = [];
 
 async function connectClients() {
   console.log(`[XRPL] Connecting to ${RPC_ENDPOINTS.length} node(s):`, RPC_ENDPOINTS);
   clients = RPC_ENDPOINTS.map(endpoint => {
-    const client = new Client(endpoint, {
-      connectionTimeout: 15000,
-      timeout: 20000
-    });
-    client.connect().catch(err => {
-      console.warn(`[XRPL] Connect failed: ${endpoint}`, err.message);
-    });
+    const client = new Client(endpoint, { connectionTimeout: 10000, timeout: 15000 });
+    client.on('connected', () => console.log(`[XRPL] Connected: ${endpoint}`));
+    client.on('error', (err) => console.error(`[XRPL] Error: ${endpoint}`, err.message));
+    client.connect().catch(err => console.error(`[XRPL] Connect failed: ${endpoint}`, err.message));
     return client;
   });
-  await new Promise(r => setTimeout(r, 5000));
+  await new Promise(r => setTimeout(r, 8000));
 }
 
-async function getHealthyClient(retries = 3) {
-  for (let i = 0; i < retries; i++) {
-    for (const client of clients) {
-      if (client.isConnected()) {
-        console.log(`[XRPL] Using: ${client.connection.url}`);
-        return client;
-      }
-    }
-    console.log(`[XRPL] Retrying ${i + 1}/${retries}...`);
-    await connectClients();
-    await new Promise(r => setTimeout(r, 3000));
+async function getHealthyClient() {
+  for (const client of clients) {
+    if (client.isConnected()) return client;
+  }
+  await connectClients();
+  for (const client of clients) {
+    if (client.isConnected()) return client;
   }
   throw new Error("No XRPL node available");
 }
 
 exports.handler = async (event) => {
-  const start = Date.now();
+  console.log("[REQUEST] Event:", event.body); // ← LOG EVERY REQUEST
+
   try {
     const body = JSON.parse(event.body || "{}");
-    const { method, params = [], id = 1 } = body;
-
-    if (!method) throw new Error("Invalid method");
+    const { command, params = [], id = 1 } = body;
+    if (!command) throw new Error("Missing command");
 
     const client = await getHealthyClient();
-    const response = await client.request({ method, params });
+    const request = { command };
+    if (params.length > 0) Object.assign(request, params[0]);
 
+    const response = await client.request(request);
     return {
       statusCode: 200,
-      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ jsonrpc: "2.0", result: response.result, id })
     };
   } catch (err) {
-    console.error("XRPL Error:", err.message);
+    console.error("[ERROR]", err.message);
     return {
       statusCode: 502,
       body: JSON.stringify({
         jsonrpc: "2.0",
         error: { code: -32603, message: "XRPL node unreachable" },
-        id: event.body?.id || 1
+        id: 1
       })
     };
-  } finally {
-    console.log(`Request took: ${Date.now() - start}ms`);
   }
 };
 
+// Connect on cold start
 connectClients();
