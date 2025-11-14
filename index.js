@@ -35,17 +35,19 @@ async function getHealthyClient(retries = 3) {
 }
 
 exports.handler = async (event) => {
+  const start = Date.now();
   try {
     const body = JSON.parse(event.body || "{}");
-    const { command, params = [], id = 1 } = body;  // ← USE "command"
-    if (!command) throw new Error("Invalid command");
+    const { method, params = [], id = 1 } = body;
+
+    if (!method) throw new Error("Invalid method");
 
     const client = await getHealthyClient();
-    const requestBody = { command, ...Object.fromEntries(params.map(p => [Object.keys(p)[0], Object.values(p)[0]])) };
-    const response = await client.request(requestBody);
+    const response = await client.request({ method, params });
 
     return {
       statusCode: 200,
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ jsonrpc: "2.0", result: response.result, id })
     };
   } catch (err) {
@@ -55,9 +57,11 @@ exports.handler = async (event) => {
       body: JSON.stringify({
         jsonrpc: "2.0",
         error: { code: -32603, message: "XRPL node unreachable" },
-        id: 1
+        id: event.body?.id || 1
       })
     };
+  } finally {
+    console.log(`Request took: ${Date.now() - start}ms`);
   }
 };
 
