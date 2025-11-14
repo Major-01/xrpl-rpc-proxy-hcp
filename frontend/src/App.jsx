@@ -23,6 +23,20 @@ function App() {
   }, [result]);
 
   const callXRPL = async () => {
+    console.log("UI: method =", method);
+    console.log("UI: account =", account);
+
+    const payload = {
+      jsonrpc: "2.0",
+      command: method,
+      params: method === "account_info" ? [{ account }] : [],
+      id: 1
+    };
+
+    console.log("UI: SENDING TO:", API_URL);
+    console.log("UI: PAYLOAD:", payload);
+
+    
     setLoading(true);
     setError('');
     setResult(null);
