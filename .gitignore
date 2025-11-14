@@ -3,4 +3,3 @@
 *.tfplan
 .terraform/
 terraform.tfvars
-lambda_function.zip
