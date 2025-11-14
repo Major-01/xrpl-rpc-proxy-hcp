@@ -13,7 +13,7 @@ resource "aws_lambda_function" "xrpl_proxy" {
   role             = aws_iam_role.lambda_role.arn
   handler          = "index.handler"
   runtime          = "nodejs20.x"
-  timeout          = 15
+  timeout          = 30
   memory_size      = 256
 
   environment {
