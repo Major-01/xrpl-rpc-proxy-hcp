@@ -4,7 +4,7 @@ import axios from 'axios';
 const API_URL = 'https://hqmqd5448l.execute-api.us-east-1.amazonaws.com';
 
 function App() {
-  const [method, setMethod] = useState('server_info');
+  const [method, setMethod] = useState('server_info');  // ← THIS IS THE ONE
   const [account, setAccount] = useState('');
   const [result, setResult] = useState(null);
   const [xrpBalance, setXrpBalance] = useState('');
@@ -31,7 +31,7 @@ function App() {
     try {
       const payload = {
         jsonrpc: "2.0",
-        command: method,
+        command: method,  // ← USE `method` (not selectedMethod)
         params: method === "account_info" ? [{ account }] : [],
         id: 1
       };
