@@ -9,3 +9,4 @@ module "xrpl_proxy" {
   rate_limit_rps = 10
   burst_limit    = 20
 }
+
