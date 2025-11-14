@@ -34,11 +34,6 @@ resource "aws_lambda_function" "xrpl_proxy" {
   }
 }
 
-  tracing_config {
-    mode = "Active"
-  }
-}
-
 # API Gateway
 resource "aws_apigatewayv2_api" "http_api" {
   name          = "${var.project_name}-api"
