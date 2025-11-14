@@ -1,11 +1,5 @@
 # Lambda function
 
-data "archive_file" "lambda_zip" {
-  type        = "zip"
-  source_dir  = "${path.module}/../../lambda"
-  output_path = "${path.module}/lambda_function.zip"
-}
-
 resource "null_resource" "install_deps" {
   provisioner "local-exec" {
     command = "cd ${path.module}/../../lambda && npm install"
@@ -35,9 +29,10 @@ resource "aws_lambda_function" "xrpl_proxy" {
   environment {
     variables = {
       RPC_ENDPOINTS = join(",", var.rpc_endpoints)
-      NETWORK       = "testnet"  # or "mainnet"
+      NETWORK       = "mainnet"
     }
   }
+}
 
   tracing_config {
     mode = "Active"
