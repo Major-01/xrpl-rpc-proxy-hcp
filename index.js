@@ -30,16 +30,19 @@ async function getHealthyClient() {
 }
 
 exports.handler = async (event) => {
-  console.log("[REQUEST] Event:", event.body); // ← LOG EVERY REQUEST
-
   try {
     const body = JSON.parse(event.body || "{}");
     const { command, params = [], id = 1 } = body;
-    if (!command) throw new Error("Missing command");
+
+    if (!command) {
+      throw new Error("Missing or invalid command");
+    }
 
     const client = await getHealthyClient();
     const request = { command };
-    if (params.length > 0) Object.assign(request, params[0]);
+    if (params.length > 0) {
+      Object.assign(request, params[0]);
+    }
 
     const response = await client.request(request);
     return {
@@ -47,7 +50,7 @@ exports.handler = async (event) => {
       body: JSON.stringify({ jsonrpc: "2.0", result: response.result, id })
     };
   } catch (err) {
-    console.error("[ERROR]", err.message);
+    console.error("LAMBDA ERROR:", err.message);
     return {
       statusCode: 502,
       body: JSON.stringify({
