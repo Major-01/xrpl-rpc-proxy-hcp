@@ -2,6 +2,8 @@ import { useState } from 'react';
 import axios from 'axios';
 
 const API_URL = 'https://hqmqd5448l.execute-api.us-east-1.amazonaws.com'; // YOUR API
+const [xrpBalance, setXrpBalance] = useState('');
+
 
 function App() {
   const [method, setMethod] = useState('server_info');
@@ -14,11 +16,21 @@ function App() {
     setLoading(true);
     setError('');
     setResult(null);
-    if (result?.result?.account_data) {
-      const drops = result.result.account_data.Balance;
-      const xrp = (drops / 1000000).toFixed(6);
-      setResult(prev => ({ ...prev, xrp }));
-    }
+    useEffect(() => {
+      if (result?.result?.account_data?.Balance) {
+        const drops = parseInt(result.result.account_data.Balance);
+        const xrp = (drops / 1000000).toFixed(6).replace(/\.?0+$/, '');
+        setXrpBalance(xrp);  // ← New state
+      }
+    }, [result]);
+
+    {xrpBalance && (
+  <div className="mt-6 p-6 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl text-center shadow-lg">
+    <p className="text-4xl font-bold text-green-700">{xrpBalance} XRP</p>
+    <p className="text-sm text-gray-600 mt-2">Mainnet Balance</p>
+  </div>
+)}
+
 
   {result?.xrp && (
   <div className="mt-4 p-4 bg-green-50 rounded-lg">
