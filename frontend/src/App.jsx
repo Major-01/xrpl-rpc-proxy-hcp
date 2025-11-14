@@ -1,48 +1,38 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const API_URL = 'https://hqmqd5448l.execute-api.us-east-1.amazonaws.com'; // YOUR API
-const [xrpBalance, setXrpBalance] = useState('');
-
+const API_URL = 'https://hqmqd5448l.execute-api.us-east-1.amazonaws.com';
 
 function App() {
   const [method, setMethod] = useState('server_info');
   const [account, setAccount] = useState('');
   const [result, setResult] = useState(null);
+  const [xrpBalance, setXrpBalance] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  // Convert drops → XRP
+  useEffect(() => {
+    if (result?.result?.account_data?.Balance) {
+      const drops = parseInt(result.result.account_data.Balance);
+      const xrp = (drops / 1000000).toFixed(6).replace(/\.?0+$/, '');
+      setXrpBalance(xrp);
+    } else {
+      setXrpBalance('');
+    }
+  }, [result]);
 
   const callXRPL = async () => {
     setLoading(true);
     setError('');
     setResult(null);
-    useEffect(() => {
-      if (result?.result?.account_data?.Balance) {
-        const drops = parseInt(result.result.account_data.Balance);
-        const xrp = (drops / 1000000).toFixed(6).replace(/\.?0+$/, '');
-        setXrpBalance(xrp);  // ← New state
-      }
-    }, [result]);
-
-    {xrpBalance && (
-  <div className="mt-6 p-6 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl text-center shadow-lg">
-    <p className="text-4xl font-bold text-green-700">{xrpBalance} XRP</p>
-    <p className="text-sm text-gray-600 mt-2">Mainnet Balance</p>
-  </div>
-)}
-
-
-  {result?.xrp && (
-  <div className="mt-4 p-4 bg-green-50 rounded-lg">
-    <p className="font-bold">Balance: {result.xrp} XRP</p>
-  </div>
-  )}
+    setXrpBalance('');
 
     try {
       const payload = {
         jsonrpc: "2.0",
-        method,
-        params: method === 'account_info' ? [{ account }] : [],
+        command: method,
+        params: method === "account_info" ? [{ account }] : [],
         id: 1
       };
 
@@ -102,12 +92,22 @@ function App() {
           </button>
         </div>
 
+        {/* XRP BALANCE */}
+        {xrpBalance && (
+          <div className="mt-6 p-6 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl text-center shadow-lg">
+            <p className="text-4xl font-bold text-green-700">{xrpBalance} XRP</p>
+            <p className="text-sm text-gray-600 mt-2">Mainnet Balance</p>
+          </div>
+        )}
+
+        {/* ERROR */}
         {error && (
           <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-lg">
             <pre className="text-sm text-red-700">{JSON.stringify(error, null, 2)}</pre>
           </div>
         )}
 
+        {/* RAW RESULT */}
         {result && (
           <div className="mt-6 p-4 bg-gray-50 border rounded-lg">
             <pre className="text-xs overflow-auto max-h-96">
