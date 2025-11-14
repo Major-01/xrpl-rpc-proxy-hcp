@@ -1,24 +1,14 @@
 # Lambda function
 
-resource "null_resource" "install_deps" {
-  provisioner "local-exec" {
-    command = "cd ${path.module}/../../lambda && npm install"
-  }
-  triggers = {
-    code_hash = filebase64sha256("${path.module}/../../lambda/index.js")
-  }
-}
-
 data "archive_file" "lambda_zip" {
   type        = "zip"
   source_dir  = "${path.module}/../../lambda"
   output_path = "${path.module}/lambda_function.zip"
-  depends_on  = [null_resource.install_deps]
 }
 
 resource "aws_lambda_function" "xrpl_proxy" {
-  filename         = data.archive_file.lambda_zip.output_path
-  source_code_hash = data.archive_file.lambda_zip.output_base64sha256
+  filename         = "lambda_function.zip"
+  source_code_hash = filebase64sha256("lambda_function.zip")
   function_name    = "${var.project_name}-lambda"
   role             = aws_iam_role.lambda_role.arn
   handler          = "index.handler"
