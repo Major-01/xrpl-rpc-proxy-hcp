@@ -66,7 +66,7 @@ function App() {
           XRPL Proxy Explorer
         </h1>
         <p className="text-center text-gray-600 mb-8">
-          Powered by AWS Lambda + Terraform
+          Powered by AWS Lambda + Terraform + Trial and MF ERROR Bro
         </p>
 
         <div className="bg-white rounded-xl shadow-lg p-6 space-y-4">
